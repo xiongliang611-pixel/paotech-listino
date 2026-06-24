@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listino Riparazioni iPhone — Paotech</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f4f0; --surface: #ffffff; --surface2: #f0efe9;
+    --accent: #1a6b47; --accent-light: #e6f4ee; --accent-mid: #2d9c68;
+    --text: #1a1a18; --text-2: #5a5a54; --text-3: #9a9a90;
+    --border: #e0dfd8; --border-strong: #c8c7be; --red: #c0392b;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .topbar {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; display: flex; align-items: center;
+    justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-logo {
+    width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace;
+  }
+  .brand-name { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .brand-sub { font-size: 12px; color: var(--text-3); }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+  .btn {
+    padding: 6px 14px; border-radius: 8px; font-size: 13px;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--surface); color: var(--text);
+    display: flex; align-items: center; gap: 6px; transition: background .12s; white-space: nowrap;
+  }
+  .btn:hover { background: var(--surface2); }
+  .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-accent:hover { background: #145438; }
+  .btn-danger { background: #fdf0ef; color: var(--red); border-color: #f5c6c2; }
+  .btn-danger:hover { background: #f9dedd; }
+
+  .edit-indicator {
+    display: flex; align-items: center; gap: 6px; font-size: 12px;
+    color: var(--accent); font-weight: 500; padding: 4px 10px;
+    background: var(--accent-light); border-radius: 20px;
+  }
+  .edit-dot { width: 7px; height: 7px; background: var(--accent-mid); border-radius: 50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+
+  .main { max-width: 980px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .section-tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+  .section-tab {
+    padding: 8px 16px; font-size: 13px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; background: none;
+    color: var(--text-3); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .12s, border-color .12s;
+  }
+  .section-tab:hover { color: var(--text-2); }
+  .section-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .info-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .badge { font-size: 12px; padding: 4px 10px; border-radius: 20px; background: var(--surface); border: 1px solid var(--border); color: var(--text-2); }
+
+  .model-nav { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+  .model-tab {
+    padding: 7px 14px; font-size: 13px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; background: none;
+    color: var(--text-3); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .12s, border-color .12s;
+  }
+  .model-tab:hover { color: var(--text-2); }
+  .model-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .table-wrap { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
+  .table-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 8px;
+  }
+  .table-title { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+  .col-legend { display: flex; gap: 14px; font-size: 11px; color: var(--text-3); flex-wrap: wrap; }
+  .col-legend span { font-family: 'DM Mono', monospace; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--surface2); }
+  th { padding: 9px 16px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--border); }
+  th:not(:first-child) { text-align: center; min-width: 90px; }
+  td { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  td:not(:first-child) { text-align: center; }
+  td:first-child { color: var(--text-2); font-size: 13px; }
+  .price-tag { display: inline-flex; align-items: baseline; gap: 1px; font-weight: 500; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; }
+  .price-tag .currency { font-size: 11px; color: var(--text-3); font-weight: 400; }
+  .price-empty { color: var(--text-3); font-size: 12px; }
+  .price-input {
+    width: 68px; padding: 4px 8px; border: 1px solid var(--border-strong); border-radius: 6px;
+    font-size: 13px; font-family: 'DM Mono', monospace; text-align: center;
+    background: var(--surface); color: var(--text); transition: border-color .12s, box-shadow .12s;
+  }
+  .price-input:focus { outline: none; border-color: var(--accent-mid); box-shadow: 0 0 0 3px rgba(29,158,117,.12); }
+  .price-input.changed { background: var(--accent-light); border-color: var(--accent-mid); }
+  tr:hover td { background: #fafaf7; }
+
+  .add-row-area {
+    padding: 12px 16px; display: none; gap: 8px; align-items: center;
+    border-top: 1px dashed var(--border-strong); background: var(--surface2);
+  }
+  .add-row-area input[type=text] {
+    flex: 1; padding: 6px 10px; border: 1px solid var(--border-strong); border-radius: 6px;
+    font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text);
+  }
+  .add-row-area input[type=text]:focus { outline: none; border-color: var(--accent-mid); }
+
+  .bc-table-wrap { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
+  .bc-table { width: 100%; border-collapse: collapse; }
+  .bc-table th { padding: 9px 20px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .bc-table th:last-child { text-align: center; min-width: 100px; }
+  .bc-table td { padding: 11px 20px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+  .bc-table tr:last-child td { border-bottom: none; }
+  .bc-table td:last-child { text-align: center; }
+  .bc-table tr:hover td { background: #fafaf7; }
+
+  .footer-bar { margin-top: 2rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .footer-note { font-size: 12px; color: var(--text-3); margin-left: auto; }
+
+
+
+
+
+  /* ── TOKEN SETUP ── */
+  .token-banner {
+    background: #fff8e6; border: 1px solid #f0c040; border-radius: 12px;
+    padding: 16px 20px; margin-bottom: 1rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .token-banner span { font-size: 13px; color: #7a5c00; }
+  .token-input-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .token-input-row input {
+    padding: 6px 10px; border: 1px solid #f0c040; border-radius: 8px;
+    font-size: 13px; font-family: 'DM Sans', sans-serif; width: 260px;
+    background: #fff; color: var(--text);
+  }
+  .token-input-row input:focus { outline: none; border-color: var(--accent-mid); }
+
+  /* ── PASSWORD MODAL ── */
+  .pw-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 300;
+    align-items: center; justify-content: center;
+  }
+  .pw-overlay.open { display: flex; }
+  .pw-box {
+    background: var(--surface); border-radius: 16px;
+    border: 1px solid var(--border); box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    width: 340px; max-width: 92vw; padding: 28px 24px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .pw-box h2 { font-size: 15px; font-weight: 600; }
+  .pw-box p { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+  .pw-input-wrap { position: relative; }
+  .pw-input {
+    width: 100%; padding: 10px 40px 10px 12px;
+    border: 1px solid var(--border-strong); border-radius: 8px;
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    background: var(--surface); color: var(--text);
+  }
+  .pw-input:focus { outline: none; border-color: var(--accent-mid); box-shadow: 0 0 0 3px rgba(29,158,117,.12); }
+  .pw-toggle {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; font-size: 16px; color: var(--text-3);
+  }
+  .pw-error { font-size: 12px; color: var(--red); display: none; }
+  .pw-actions { display: flex; gap: 8px; }
+  .sync-status {
+    font-size: 12px; color: var(--text-3);
+    display: flex; align-items: center; gap: 6px; margin-left: auto;
+  }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+  .sync-dot.ok { background: var(--accent-mid); }
+  .sync-dot.saving { background: #f39c12; animation: pulse 1s infinite; }
+  .sync-dot.error { background: var(--red); }
+
+  /* ── BOOKING BANNER ── */
+  .booking-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+  }
+  .booking-info { display: flex; align-items: center; gap: 14px; }
+  .booking-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--accent-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .booking-text {}
+  .booking-title { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .booking-sub { font-size: 12px; color: var(--text-3); }
+  .btn-booking {
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    display: flex; align-items: center; gap: 8px;
+    transition: background .12s;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .btn-booking:hover { background: #145438; }
+  @media (max-width: 500px) {
+    .booking-banner { flex-direction: column; align-items: flex-start; }
+    .btn-booking { width: 100%; justify-content: center; }
+  }
+
+  /* ── MODEL MANAGER MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.35); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 16px;
+    border: 1px solid var(--border); box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    width: 420px; max-width: 95vw; max-height: 80vh;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .modal-head {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-head h2 { font-size: 15px; font-weight: 600; }
+  .modal-close {
+    background: none; border: none; cursor: pointer;
+    font-size: 20px; color: var(--text-3); line-height: 1; padding: 2px 6px;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+  .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+  .model-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .model-list-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface);
+    transition: background .1s;
+  }
+  .model-list-item:hover { background: var(--surface2); }
+  .model-list-item .drag-handle {
+    cursor: grab; color: var(--text-3); font-size: 16px; user-select: none; flex-shrink: 0;
+  }
+  .model-list-item .model-name-input {
+    flex: 1; border: none; background: transparent; font-size: 13px;
+    font-family: 'DM Sans', sans-serif; color: var(--text); padding: 2px 4px;
+    border-radius: 4px;
+  }
+  .model-name-input:focus { outline: 1px solid var(--accent-mid); background: var(--accent-light); }
+  .model-list-item .del-model-item {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-3); font-size: 15px; padding: 2px 4px; flex-shrink: 0;
+  }
+  .model-list-item .del-model-item:hover { color: var(--red); }
+  .add-model-row { display: flex; gap: 8px; margin-top: 4px; }
+  .add-model-row input {
+    flex: 1; padding: 7px 10px; border: 1px solid var(--border-strong);
+    border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    background: var(--surface); color: var(--text);
+  }
+  .add-model-row input:focus { outline: none; border-color: var(--accent-mid); box-shadow: 0 0 0 3px rgba(29,158,117,.12); }
+  .model-list-item.dragging { opacity: 0.4; }
+  .model-list-item.drag-over { border-color: var(--accent-mid); background: var(--accent-light); }
+
+  @media print {
+    .topbar,.section-tabs,.model-nav,.footer-bar,.add-row-area,.btn,.edit-indicator { display: none !important; }
+    .main { padding: 1rem; max-width: 100%; }
+    .table-wrap,.bc-table-wrap { box-shadow: none; border: 1px solid #ccc; }
+    body { background: #fff; }
+  }
+  @media (max-width: 640px) {
+    .topbar { padding: 0 1rem; }
+    .main { padding: 1rem 0.75rem 3rem; }
+    th,td { padding: 8px 10px; font-size: 12px; }
+    th:not(:first-child),td:not(:first-child) { min-width: 70px; }
+    .price-input { width: 56px; }
+    .col-legend { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="data:image/png;base64,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" alt="Paotech logo" style="height:36px;width:auto;display:block;">
+    <div>
+      <div class="brand-name">Listino Riparazioni iPhone</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span id="edit-indicator" class="edit-indicator" style="display:none">
+      <span class="edit-dot"></span> Modalità modifica
+    </span>
+    <span class="sync-status" id="sync-status">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-label">Caricamento...</span>
+    </span>
+    <button class="btn" id="toggle-edit-btn" onclick="toggleEdit()">✏️ Modifica prezzi</button>
+    <button class="btn" onclick="openModelModal()">📋 Modelli</button>
+    <button class="btn" onclick="window.print()">🖨️ Stampa</button>
+    <button class="btn btn-accent" onclick="exportCSV()">⬇️ Esporta CSV</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="token-banner" id="token-banner" style="display:none">
+    <span>⚠️ <b>Token GitHub mancante.</b> Inserisci il tuo Personal Access Token (scope: gist) per attivare il salvataggio online.</span>
+    <div class="token-input-row">
+      <input type="password" id="token-input" placeholder="ghp_..." />
+      <button class="btn btn-accent" onclick="saveToken()">Salva token</button>
+    </div>
+  </div>
+
+  <div class="section-tabs">
+    <button class="section-tab active" onclick="showSection('riparazioni')">📱 Riparazioni</button>
+    <button class="section-tab" onclick="showSection('backcover')">🔲 Backcover</button>
+  </div>
+
+  <div id="section-riparazioni">
+    <div class="info-row">
+      <span class="badge">📋 Prezzi per clienti finali</span>
+      <span class="badge">📱 Da telefono montato</span>
+      <span class="badge">🚚 Escluso spedizioni</span>
+      <span class="badge">⏱ Tempistica lavorazione 1 giorno</span>
+      <span class="badge">📍 Su appuntamento 2 ore</span>
+    </div>
+    <div class="model-nav" id="model-nav"></div>
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="table-title" id="table-title"></div>
+        <div class="col-legend">
+          <span>Comp.Eco = Compatibile Economico</span>
+          <span>Comp.Ori = Compatibile Originale</span>
+          <span>Ori.Rig = Originale Rigenerato</span>
+          <span>Ori.Apple = Originale Apple</span>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:38%">Riparazione</th>
+            <th>Comp.Eco</th><th>Comp.Ori</th><th>Ori.Rig</th><th>Ori.Apple</th>
+            <th id="delete-col" style="display:none;width:36px"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="add-row-area" id="add-row-area">
+        <input type="text" id="new-repair-name" placeholder="Nome riparazione (es. Microfono)">
+        <button class="btn btn-accent" onclick="addRow()">+ Aggiungi</button>
+      </div>
+    </div>
+    <div class="footer-bar">
+      <button class="btn btn-danger" id="del-model-btn" onclick="deleteModel()" style="display:none">🗑 Rimuovi modello</button>
+      <span class="footer-note" id="last-saved"></span>
+    </div>
+  <div class="booking-banner" style="margin-top:1.5rem;margin-bottom:0">
+      <div class="booking-info">
+        <div class="booking-icon">📅</div>
+        <div class="booking-text">
+          <div class="booking-title">Prenota un appuntamento</div>
+          <div class="booking-sub">Riparazione in 2 ore · Su appuntamento · Paotech Repair Center</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <a class="btn-booking" href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2oouVx2LS8gzfph_Cq2Yuu87DW1B38-ZsBnmbMk537wpJAvl3hzQqVAMlEFBS9O8ocm1nJQbnW?gv=true" target="_blank" rel="noopener">
+          📆 Prenota ora
+        </a>
+        <a class="btn-booking" href="https://antoniopaone3-sys.github.io/Paotech/" target="_blank" rel="noopener" style="background:#1a1a18;border-color:#1a1a18">
+          🔗 Vai al sito
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="section-backcover" style="display:none">
+    <div class="info-row">
+      <span class="badge">📋 Prezzi per clienti finali</span>
+      <span class="badge">📱 Da telefono montato</span>
+      <span class="badge">🚚 Escluso spedizioni</span>
+      <span class="badge">⏱ Tempistica lavorazione 2-3 giorni</span>
+    </div>
+    <div class="bc-table-wrap">
+      <div class="table-header">
+        <div class="table-title">Sostituzione Backcover (Comp.Ori)</div>
+      </div>
+      <table class="bc-table">
+        <thead><tr><th>Modello</th><th>Comp.Ori</th></tr></thead>
+        <tbody id="bc-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PASSWORD MODAL -->
+  <div class="pw-overlay" id="pw-overlay">
+    <div class="pw-box">
+      <h2>🔒 Modifica protetta</h2>
+      <p>Hai effettuato 3 modifiche. Inserisci la password per continuare a modificare.</p>
+      <div class="pw-input-wrap">
+        <input class="pw-input" type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkPassword()">
+        <button class="pw-toggle" onclick="togglePwVisibility()" tabindex="-1">👁</button>
+      </div>
+      <div class="pw-error" id="pw-error">Password errata. Riprova.</div>
+      <div class="pw-actions">
+        <button class="btn btn-accent" onclick="checkPassword()">Conferma</button>
+        <button class="btn" onclick="closePwModal()">Annulla</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODEL MANAGER MODAL -->
+  <div class="modal-overlay" id="model-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Gestione modelli</h2>
+        <button class="modal-close" onclick="closeModelModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <ul class="model-list" id="model-list-ul"></ul>
+        <div class="add-model-row">
+          <input type="text" id="new-model-input" placeholder="es. iPhone 17 Pro" onkeydown="if(event.key==='Enter')saveNewModel()">
+          <button class="btn btn-accent" onclick="saveNewModel()">+ Aggiungi</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-accent" onclick="applyModelChanges()">✓ Salva modifiche</button>
+        <button class="btn" onclick="closeModelModal()">Annulla</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const COLS = ['Comp.Eco','Comp.Ori','Ori.Rig','Ori.Apple'];
+const GIST_ID = '6d495f6ba1eeaceec0f021f7541b7be4';
+const GIST_TOKEN = localStorage.getItem('paotech_gh_token') || '';
+const GIST_FILE = 'paotech_listino.json';
+const PASSWORD_HASH = '7c4a8d09ca3762af61e59520943dc26494f8941b'; // SHA1 of "Paotech2024"
+
+// ── PASSWORD & EDIT COUNT ──
+let editCount = 0;
+let unlocked = false;
+let pendingAction = null;
+
+async function sha1(str) {
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function requireAuth(action) {
+  if (unlocked) { action(); return; }
+  editCount++;
+  if (editCount > 3) {
+    pendingAction = action;
+    openPwModal();
+  } else {
+    action();
+  }
+}
+
+function openPwModal() {
+  document.getElementById('pw-overlay').classList.add('open');
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').style.display = 'none';
+  setTimeout(() => document.getElementById('pw-input').focus(), 100);
+}
+
+function closePwModal() {
+  document.getElementById('pw-overlay').classList.remove('open');
+  pendingAction = null;
+  // rollback editCount so they don't get stuck
+  editCount = 3;
+}
+
+async function checkPassword() {
+  const val = document.getElementById('pw-input').value;
+  const hash = await sha1(val);
+  if (hash === PASSWORD_HASH) {
+    unlocked = true;
+    document.getElementById('pw-overlay').classList.remove('open');
+    if (pendingAction) { pendingAction(); pendingAction = null; }
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+function togglePwVisibility() {
+  const inp = document.getElementById('pw-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ── GIST SYNC ──
+function setSyncStatus(state, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + state;
+  lbl.textContent = label;
+}
+
+async function loadFromGist() {
+  setSyncStatus('saving', 'Caricamento...');
+  try {
+    const resp = await fetch('https://api.github.com/gists/' + GIST_ID, {
+      headers: { 'Authorization': 'token ' + (localStorage.getItem('paotech_gh_token')||''), 'User-Agent': 'paotech-listino' }
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const content = JSON.parse(data.files[GIST_FILE].content);
+    listino = content.listino;
+    backcover = content.backcover;
+    modelKeys = Object.keys(listino);
+    setSyncStatus('ok', 'Sincronizzato');
+    renderNav();
+    renderTable();
+  } catch(e) {
+    setSyncStatus('error', 'Errore caricamento');
+    console.error(e);
+  }
+}
+
+async function saveToGist() {
+  setSyncStatus('saving', 'Salvataggio...');
+  try {
+    const content = JSON.stringify({ listino, backcover }, null, 2);
+    const resp = await fetch('https://api.github.com/gists/' + GIST_ID, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': 'token ' + (localStorage.getItem('paotech_gh_token')||''),
+        'Content-Type': 'application/json',
+        'User-Agent': 'paotech-listino'
+      },
+      body: JSON.stringify({ files: { [GIST_FILE]: { content } } })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    setSyncStatus('ok', 'Salvato ✓');
+    updateSavedNote();
+  } catch(e) {
+    setSyncStatus('error', 'Errore salvataggio');
+    console.error(e);
+  }
+}
+
+const DEFAULT_LISTINO = {
+  'iPhone 8': {'Display':[40,55,65,null],'Batteria con avviso sostituzione':[null,40,null,null],'Altoparlante':[null,40,null,null],'Connettore di ricarica':[null,45,null,null]},
+  'iPhone 8 Plus': {'Display':[45,60,70,null],'Batteria con avviso sostituzione':[null,45,null,null],'Altoparlante':[null,40,null,null],'Connettore di ricarica':[null,45,null,null]},
+  'iPhone X': {'Display':[60,90,120,null],'Batteria con avviso sostituzione':[null,50,null,null],'Altoparlante':[null,50,null,null],'Connettore di ricarica':[null,50,null,null]},
+  'iPhone XS': {'Display':[70,100,130,null],'Batteria con avviso sostituzione':[null,60,null,null],'Altoparlante':[null,60,null,null],'Connettore di ricarica':[null,60,null,null]},
+  'iPhone XR': {'Display':[60,90,110,null],'Batteria con avviso sostituzione':[null,50,null,null],'Altoparlante':[null,50,null,null]},
+  'iPhone XS Max': {'Display':[70,100,180,null],'Batteria con avviso sostituzione':[null,55,null,null],'Altoparlante':[null,50,null,null],'Connettore di ricarica':[null,50,null,null]},
+  'iPhone SE 2020': {'Display':[45,60,75,null],'Batteria con avviso sostituzione':[null,45,null,null],'Altoparlante':[null,45,null,null],'Connettore di ricarica':[null,45,null,null]},
+  'iPhone 11': {'Display':[60,80,120,null],'Batteria con avviso sostituzione':[null,50,null,null],'Altoparlante':[null,50,null,null],'Connettore di ricarica originale':[null,60,null,null]},
+  'iPhone 11 Pro': {'Display':[85,110,140,null],'Batteria con avviso sostituzione':[null,60,null,null],'Altoparlante':[null,50,null,null],'Connettore di ricarica originale':[null,65,null,null]},
+  'iPhone 11 Pro Max': {'Display':[95,120,150,null],'Batteria con avviso sostituzione':[null,60,null,null],'Altoparlante':[null,50,null,null],'Connettore di ricarica originale':[null,75,null,null]},
+  'iPhone SE 2022': {'Display':[40,65,80,null],'Batteria con avviso sostituzione':[null,50,null,null],'Altoparlante':[null,45,null,null],'Connettore di ricarica originale':[null,50,null,null]},
+  'iPhone 12': {'Display':[70,110,150,339],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,70,null,null],'Connettore di ricarica originale':[null,80,null,null]},
+  'iPhone 12 Mini': {'Display':[85,120,180,269],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,65,null,null],'Connettore di ricarica originale':[null,65,null,null]},
+  'iPhone 12 Pro': {'Display':[85,125,165,339],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,70,null,null],'Connettore di ricarica originale':[null,80,null,null]},
+  'iPhone 12 Pro Max': {'Display':[90,140,220,405],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,80,null,null],'Connettore di ricarica originale':[null,85,null,null]},
+  'iPhone 13': {'Display':[90,130,200,339],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,80,null,null],'Connettore di ricarica originale':[null,80,null,null]},
+  'iPhone 13 Mini': {'Display':[80,130,190,269],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,80,null,null],'Connettore di ricarica originale':[null,80,null,null]},
+  'iPhone 13 Pro': {'Display':[90,150,220,339],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,85,null,null],'Connettore di ricarica originale':[null,90,null,null]},
+  'iPhone 13 Pro Max': {'Display':[90,160,250,405],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,90,null,null],'Connettore di ricarica originale':[null,90,null,null]},
+  'iPhone 14': {'Display':[75,120,190,339],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,80,null,null],'Connettore di ricarica originale':[null,80,null,null]},
+  'iPhone 14 Plus': {'Display':[85,139,199,405],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,80,null,null],'Connettore di ricarica originale':[null,80,null,null]},
+  'iPhone 14 Pro': {'Display':[95,180,280,405],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,80,null,null],'Connettore di ricarica originale':[null,100,null,null]},
+  'iPhone 14 Pro Max': {'Display':[110,190,290,399],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,80,null,null],'Connettore di ricarica originale':[null,100,null,null]},
+  'iPhone 15': {'Display':[95,170,260,339],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,80,null,null],'Connettore di ricarica originale':[null,80,null,null]},
+  'iPhone 15 Plus': {'Display':[105,180,275,405],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,80,null,null],'Connettore di ricarica originale':[null,90,null,null]},
+  'iPhone 15 Pro': {'Display':[130,210,290,405],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,90,null,null],'Connettore di ricarica originale':[null,100,null,null]},
+  'iPhone 15 Pro Max': {'Display':[145,230,310,489],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,100,null,null],'Connettore di ricarica originale':[null,99,null,null]},
+  'iPhone 16': {'Display':[165,235,350,489],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,100,null,null],'Connettore di ricarica originale':[null,110,null,null]},
+  'iPhone 16 Pro': {'Display':[150,220,330,405],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,100,null,null],'Connettore di ricarica originale':[null,100,null,null]},
+  'iPhone 16 Pro Max': {'Display':[145,230,310,489],'Batteria con avviso sostituzione':[null,60,null,null],'Batteria originale':[null,null,null,100],'Altoparlante':[null,100,null,null],'Connettore di ricarica originale':[null,99,null,null]}
+};
+
+const DEFAULT_BACKCOVER = [
+  {model:'iPhone 8',price:60},{model:'iPhone X - 8 Plus',price:60},
+  {model:'iPhone XS - SE 2020',price:70},{model:'iPhone 11 - XS Max',price:80},
+  {model:'iPhone 11 Pro - SE 2022',price:90},{model:'iPhone 12 - 12 Mini - 11 Pro Max',price:90},
+  {model:'iPhone 13 - 12 Pro - 13 Mini',price:95},{model:'iPhone 13 Pro - 12 Pro Max',price:100},
+  {model:'iPhone 14',price:80},{model:'iPhone 13 Pro Max',price:110},
+  {model:'iPhone 15 - 14 Plus',price:90},{model:'iPhone 14 Pro',price:110},
+  {model:'iPhone 14 Pro Max',price:120},{model:'iPhone 15 Pro',price:120},
+  {model:'iPhone 15 Plus',price:90},{model:'iPhone 15 Pro Max',price:120},
+  {model:'iPhone 16',price:100},{model:'iPhone 16 Pro',price:130},{model:'iPhone 16 Pro Max',price:140}
+];
+
+let listino = JSON.parse(localStorage.getItem('paotech_listino_v3') || 'null') || DEFAULT_LISTINO;
+let backcover = JSON.parse(localStorage.getItem('paotech_backcover_v2') || 'null') || DEFAULT_BACKCOVER;
+let modelKeys = Object.keys(listino);
+let currentIdx = 0;
+let editMode = false;
+let currentSection = 'riparazioni';
+
+function currentModel() { return modelKeys[currentIdx]; }
+
+function showSection(s) {
+  currentSection = s;
+  document.getElementById('section-riparazioni').style.display = s === 'riparazioni' ? '' : 'none';
+  document.getElementById('section-backcover').style.display = s === 'backcover' ? '' : 'none';
+  document.querySelectorAll('.section-tab').forEach((t,i) => t.classList.toggle('active', i === (s==='riparazioni'?0:1)));
+  if (s === 'backcover') renderBackcover();
+}
+
+function init() {
+  modelKeys = Object.keys(listino);
+  renderNav();
+  renderTable();
+  updateSavedNote();
+  checkToken();
+  if (localStorage.getItem('paotech_gh_token')) loadFromGist();
+}
+
+function renderNav() {
+  const nav = document.getElementById('model-nav');
+  nav.innerHTML = '';
+  modelKeys.forEach((m, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'model-tab' + (idx === currentIdx ? ' active' : '');
+    btn.textContent = m;
+    btn.addEventListener('click', () => selectModel(idx));
+    nav.appendChild(btn);
+  });
+}
+
+function selectModel(idx) {
+  currentIdx = idx;
+  renderNav();
+  renderTable();
+}
+
+function renderTable() {
+  const m = currentModel();
+  document.getElementById('table-title').textContent = m;
+  const repairs = listino[m];
+  const tbody = document.getElementById('tbody');
+  const delCol = document.getElementById('delete-col');
+  delCol.style.display = editMode ? '' : 'none';
+  tbody.innerHTML = '';
+
+  Object.entries(repairs).forEach(([rep, prices]) => {
+    const tr = document.createElement('tr');
+    const tdName = document.createElement('td');
+    tdName.textContent = rep;
+    tr.appendChild(tdName);
+
+    prices.forEach((p, i) => {
+      const td = document.createElement('td');
+      if (editMode) {
+        const inp = document.createElement('input');
+        inp.type = 'number'; inp.min = '0'; inp.step = '1';
+        inp.className = 'price-input';
+        inp.value = p ?? '';
+        inp.placeholder = '—';
+        inp.addEventListener('input', function() {
+          listino[m][rep][i] = this.value === '' ? null : parseFloat(this.value);
+          this.classList.toggle('changed', this.value !== '');
+        });
+        td.appendChild(inp);
+      } else {
+        if (p != null) {
+          td.innerHTML = '<span class="price-tag"><span class="currency">€</span>' + p + '</span>';
+        } else {
+          td.innerHTML = '<span class="price-empty">—</span>';
+        }
+      }
+      tr.appendChild(td);
+    });
+
+    if (editMode) {
+      const tdDel = document.createElement('td');
+      const btnDel = document.createElement('button');
+      btnDel.textContent = '✕';
+      btnDel.style.cssText = 'background:none;border:none;cursor:pointer;color:#c0392b;font-size:15px';
+      btnDel.title = 'Rimuovi';
+      btnDel.addEventListener('click', () => deleteRow(rep));
+      tdDel.appendChild(btnDel);
+      tr.appendChild(tdDel);
+    }
+
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('add-row-area').style.display = editMode ? 'flex' : 'none';
+}
+
+function renderBackcover() {
+  const tbody = document.getElementById('bc-tbody');
+  tbody.innerHTML = '';
+  backcover.forEach((row, i) => {
+    const tr = document.createElement('tr');
+    const tdModel = document.createElement('td');
+    tdModel.textContent = row.model;
+    tr.appendChild(tdModel);
+    const tdPrice = document.createElement('td');
+    if (editMode) {
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.min = '0'; inp.step = '1';
+      inp.className = 'price-input'; inp.value = row.price;
+      inp.addEventListener('input', function() { backcover[i].price = parseFloat(this.value) || 0; });
+      tdPrice.appendChild(inp);
+    } else {
+      tdPrice.innerHTML = '<span class="price-tag"><span class="currency">€</span>' + row.price + '</span>';
+    }
+    tr.appendChild(tdPrice);
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleEdit() {
+  if (!editMode) {
+    requireAuth(() => { editMode = true; applyEditMode(); });
+    return;
+  }
+  editMode = false;
+  applyEditMode();
+}
+function applyEditMode() {
+  const btn = document.getElementById('toggle-edit-btn');
+  const ind = document.getElementById('edit-indicator');
+  if (editMode) {
+    btn.textContent = '✓ Fine modifica';
+    btn.className = 'btn btn-accent';
+    ind.style.display = 'flex';
+  } else {
+    btn.textContent = '✏️ Modifica prezzi';
+    btn.className = 'btn';
+    ind.style.display = 'none';
+    saveData();
+  }
+  const delBtn = document.getElementById('del-model-btn');
+  if (delBtn) delBtn.style.display = editMode ? '' : 'none';
+  renderNav();
+  renderTable();
+  if (currentSection === 'backcover') renderBackcover();
+}
+
+function addRow() {
+  const inp = document.getElementById('new-repair-name');
+  const name = inp.value.trim();
+  if (!name) return;
+  const m = currentModel();
+  if (listino[m][name]) { alert('Riparazione già presente.'); return; }
+  listino[m][name] = [null,null,null,null];
+  inp.value = '';
+  renderTable();
+}
+
+function deleteRow(repair) {
+  if (!confirm('Rimuovere "' + repair + '"?')) return;
+  delete listino[currentModel()][repair];
+  renderTable();
+}
+
+function addModel() {
+  const name = prompt('Nome del nuovo modello (es. iPhone 17):');
+  if (!name || !name.trim()) return;
+  const n = name.trim();
+  if (listino[n]) { alert('Modello già presente.'); return; }
+  listino[n] = {'Display':[null,null,null,null],'Batteria con avviso sostituzione':[null,null,null,null]};
+  modelKeys = Object.keys(listino);
+  currentIdx = modelKeys.length - 1;
+  renderNav();
+  renderTable();
+}
+
+function deleteModel() {
+  const m = currentModel();
+  if (!confirm('Rimuovere il modello "' + m + '"?')) return;
+  delete listino[m];
+  modelKeys = Object.keys(listino);
+  currentIdx = 0;
+  renderNav();
+  renderTable();
+}
+
+function saveData() {
+  saveToGist();
+}
+
+function updateSavedNote() {
+  const saved = localStorage.getItem('paotech_saved');
+  if (saved) document.getElementById('last-saved').textContent = 'Ultimo salvataggio: ' + saved;
+}
+
+function exportCSV() {
+  let csv = '\uFEFF=== LISTINO RIPARAZIONI ===\nModello,Riparazione,' + COLS.join(',') + '\n';
+  Object.entries(listino).forEach(([model, repairs]) => {
+    Object.entries(repairs).forEach(([rep, prices]) => {
+      csv += '"' + model + '","' + rep + '",' + prices.map(p => p ?? '').join(',') + '\n';
+    });
+  });
+  csv += '\n=== LISTINO BACKCOVER ===\nModello,Comp.Ori\n';
+  backcover.forEach(row => { csv += '"' + row.model + '",' + row.price + '\n'; });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'listino_paotech_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+
+// ── TOKEN SETUP ──
+function saveToken() {
+  const val = document.getElementById('token-input').value.trim();
+  if (!val.startsWith('ghp_')) { alert('Token non valido. Deve iniziare con ghp_'); return; }
+  localStorage.setItem('paotech_gh_token', val);
+  document.getElementById('token-banner').style.display = 'none';
+  loadFromGist();
+}
+
+function checkToken() {
+  const t = localStorage.getItem('paotech_gh_token');
+  if (!t) {
+    document.getElementById('token-banner').style.display = 'flex';
+    setSyncStatus('error', 'Token mancante');
+  }
+}
+
+init();
+
+// ── MODEL MANAGER ──
+let pendingModelOrder = [];
+let dragSrcIdx = null;
+
+function openModelModal() {
+  pendingModelOrder = modelKeys.map((k, i) => ({ key: k, idx: i }));
+  renderModelList();
+  document.getElementById('model-modal').classList.add('open');
+  document.getElementById('new-model-input').value = '';
+}
+
+function closeModelModal() {
+  document.getElementById('model-modal').classList.remove('open');
+}
+
+function renderModelList() {
+  const ul = document.getElementById('model-list-ul');
+  ul.innerHTML = '';
+  pendingModelOrder.forEach((item, i) => {
+    const li = document.createElement('li');
+    li.className = 'model-list-item';
+    li.draggable = true;
+    li.dataset.i = i;
+
+    const handle = document.createElement('span');
+    handle.className = 'drag-handle';
+    handle.textContent = '⠿';
+    handle.title = 'Trascina per riordinare';
+
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'model-name-input';
+    inp.value = item.key;
+    inp.addEventListener('change', function() { pendingModelOrder[i].key = this.value.trim() || pendingModelOrder[i].key; });
+
+    const del = document.createElement('button');
+    del.className = 'del-model-item';
+    del.textContent = '✕';
+    del.title = 'Rimuovi modello';
+    del.addEventListener('click', () => {
+      if (confirm('Rimuovere "' + pendingModelOrder[i].key + '" e tutte le sue riparazioni?')) {
+        pendingModelOrder.splice(i, 1);
+        renderModelList();
+      }
+    });
+
+    // Drag events
+    li.addEventListener('dragstart', (e) => { dragSrcIdx = i; li.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+    li.addEventListener('dragend', () => { li.classList.remove('dragging'); document.querySelectorAll('.model-list-item').forEach(el => el.classList.remove('drag-over')); });
+    li.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; li.classList.add('drag-over'); });
+    li.addEventListener('dragleave', () => li.classList.remove('drag-over'));
+    li.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (dragSrcIdx === null || dragSrcIdx === i) return;
+      const moved = pendingModelOrder.splice(dragSrcIdx, 1)[0];
+      pendingModelOrder.splice(i, 0, moved);
+      dragSrcIdx = null;
+      renderModelList();
+    });
+
+    li.appendChild(handle);
+    li.appendChild(inp);
+    li.appendChild(del);
+    ul.appendChild(li);
+  });
+}
+
+function saveNewModel() {
+  const inp = document.getElementById('new-model-input');
+  const name = inp.value.trim();
+  if (!name) return;
+  if (pendingModelOrder.find(x => x.key === name)) { alert('Modello già presente.'); return; }
+  pendingModelOrder.push({ key: name, idx: -1 });
+  inp.value = '';
+  renderModelList();
+}
+
+function applyModelChanges() {
+  const newListino = {};
+  pendingModelOrder.forEach(item => {
+    const oldKey = modelKeys[item.idx] || null;
+    const newKey = item.key;
+    if (oldKey && listino[oldKey]) {
+      newListino[newKey] = listino[oldKey];
+    } else if (!oldKey) {
+      // brand new model
+      newListino[newKey] = {'Display':[null,null,null,null],'Batteria con avviso sostituzione':[null,null,null,null]};
+    }
+  });
+  listino = newListino;
+  modelKeys = Object.keys(listino);
+  // keep currentIdx in bounds
+  if (currentIdx >= modelKeys.length) currentIdx = 0;
+  saveData();
+  closeModelModal();
+  renderNav();
+  renderTable();
+}
+
+// Close modal clicking outside
+document.getElementById('model-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModelModal();
+});
+
+</script>
+</body>
+</html>
